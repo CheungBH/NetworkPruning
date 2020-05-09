@@ -9,6 +9,7 @@ import time
 from tensorboardX import SummaryWriter
 import torchvision.models as models
 from src.compute_flops import print_model_param_flops, print_model_param_nums
+import numpy as np
 
 try:
     from apex import amp
@@ -190,9 +191,9 @@ class MobilenetSparseTrainer:
             bn_all_weight = []
             for idx, bn_layer in enumerate(bn_ls):
                 bn_weight = list(bn_layer.parameters())[0]
-                bn_all_weight += bn_weight
+                bn_all_weight += bn_weight.tolist()
                 self.writer.add_histogram("bn{}_weight".format(idx), bn_weight, epoch)
-            self.writer.add_histogram("bn_all_weight", bn_all_weight, epoch)
+            self.writer.add_histogram("bn_all_weight", np.array(bn_all_weight), epoch)
 
             if epoch in [self.epoch * 0.5, self.epoch * 0.75]:
                 for param_group in self.optimizer.param_groups:
