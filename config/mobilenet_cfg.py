@@ -9,14 +9,14 @@ device = 'cuda'
 
 mob_dest = "mob_bn_test"
 mob_sparse_dataset = ["cifar100", "cifar10"]
-mob_sparse_param = [1e-4, 1e-3]
-mob_ifsparse = [False, True]
-sparse_setting = [0]
+mob_sparse_param = [1e-4, 1e-3, 5e-4, 2e-4]
+mob_ifsparse = [True, False]
+sparse_setting = ["origin"]
 # sparse_setting = ["big_c_huge_t_chprune", "big_c_big_t_chprune", "big_c_origin_t_chprune", "origin_c_big_t_chprune",
 #                   "origin_c_huge_t_chprune"]
 
-mob_epoch = 2
-mob_batch_size = 128
+mob_epoch = 160
+mob_batch_size = 1024
 
 
 settings = {
@@ -120,7 +120,7 @@ settings = {
         [10, 160, 3, 2],
         [10, 320, 1, 1],
     ],
-    0:
+    "origin":
         [[1, 16, 1, 1],
          [6, 24, 2, 2],
          [6, 32, 3, 2],

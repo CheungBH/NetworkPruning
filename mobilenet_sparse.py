@@ -70,7 +70,7 @@ class MobilenetSparseTrainer:
         self.optimizer = optim.SGD(self.model.parameters(), lr=lr, momentum=momentum, weight_decay=weight_decay)
         self.model = self.model.to(device)
 
-        self.bn_file = open("bn.txt", "w")
+        self.bn_file = open(os.path.join(bn_log_dest, self.model_str.replace(".pth", "_bn.txt")), "w")
 
         if mixed_precision:
             self.model, self.optimizer = amp.initialize(self.model, self.optimizer, opt_level="O1")
@@ -93,9 +93,9 @@ class MobilenetSparseTrainer:
         else:
             raise ValueError()
         train_loader = torch.utils.data.DataLoader(trainset, batch_size=self.batch_size, shuffle=True,
-                                                   num_workers=num_workers)
+                                                   num_workers=5)
         test_loader = torch.utils.data.DataLoader(testset, batch_size=self.batch_size, shuffle=True,
-                                                  num_workers=num_workers)
+                                                  num_workers=2)
         return nums, train_loader, test_loader
 
     def save_structure(self):
@@ -129,9 +129,9 @@ class MobilenetSparseTrainer:
 
             test_loss /= len(self.test_loader.dataset)
             print('Test set: learning rate : {} Average loss: {:.4f}, Accuracy: {}/{} ({:.1f}%)\n'.format(lr,
-                     test_loss, correct,len(self.test_loader.dataset), 100. * correct / len(self.test_loader.dataset)))
+                     test_loss, correct, len(self.test_loader.dataset), 100. * correct / len(self.test_loader.dataset)))
             self.log.write('\nTest set: learning rate : {} Average loss: {:.4f}, Accuracy: {}/{} ({:.1f}%)\n'.format(lr,
-                     test_loss, correct,len(self.test_loader.dataset), 100. * correct / len(self.test_loader.dataset)))
+                     test_loss, correct, len(self.test_loader.dataset), 100. * correct / len(self.test_loader.dataset)))
 
         return float(correct) / float(len(self.test_loader.dataset)), test_loss
 
@@ -155,7 +155,7 @@ class MobilenetSparseTrainer:
                 loss.backward()
             if self.sparse:
                 bn = self.updateBN()
-                self.writer.add_scalar("bn", bn)
+                self.writer.add_scalar("bn", bn, epoch)
                 print(bn, file=self.bn_file)
             self.optimizer.step()
 
