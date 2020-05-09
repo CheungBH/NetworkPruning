@@ -187,9 +187,12 @@ class MobilenetSparseTrainer:
                     name, param.clone().data.to("cpu").numpy(), epoch)
 
             bn_ls = [m for m in list(self.model.modules()) if isinstance(m, nn.BatchNorm2d)]
+            bn_all_weight = []
             for idx, bn_layer in enumerate(bn_ls):
                 bn_weight = list(bn_layer.parameters())[0]
+                bn_all_weight += bn_weight
                 self.writer.add_histogram("bn{}_weight".format(idx), bn_weight, epoch)
+            self.writer.add_histogram("bn_all_weight", bn_all_weight, epoch)
 
             if epoch in [self.epoch * 0.5, self.epoch * 0.75]:
                 for param_group in self.optimizer.param_groups:
