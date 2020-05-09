@@ -203,6 +203,7 @@ class MobilenetSparseTrainer:
                     param_group['lr'] *= 0.1
             train_acc, train_loss = self.train(epoch)
             val_acc, val_loss = self.test()
+            self.bn_file.write("\n")
 
             best_train_acc = train_acc if train_acc > best_train_acc else best_train_acc
             best_train_loss = train_loss if train_loss < best_train_loss else best_train_loss
