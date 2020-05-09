@@ -24,6 +24,8 @@ start_epoch = 0
 dest_folder = os.path.join("sparse_result", config.mob_dest)
 os.makedirs(os.path.join(dest_folder, "model"), exist_ok=True)
 os.makedirs(os.path.join(dest_folder, "log"), exist_ok=True)
+bn_log_dest = os.path.join("bn_log", config.mob_dest)
+os.makedirs(bn_log_dest, exist_ok=True)
 
 lr = config.lr
 device = config.device
@@ -76,6 +78,7 @@ class MobilenetSparseTrainer:
         os.makedirs(os.path.join("runs", dest_folder), exist_ok=True)
         self.writer = SummaryWriter(os.path.join("runs", dest_folder, self.model_str[:-4]))
         self.model_path = os.path.join(dest_folder, "model", self.model_str)
+        os.makedirs(self.model_path[:-4], exist_ok=True)
         self.save_structure()
 
     def get_dataset(self, ds):

@@ -7,7 +7,7 @@ device = 'cuda'
 # print("Using {}".format(device))
 
 
-mob_dest = "sparse_result/mob_bn_test"
+mob_dest = "mob_bn_test"
 mob_sparse_dataset = ["cifar100", "cifar10"]
 mob_sparse_param = [1e-4, 1e-3]
 mob_ifsparse = [False, True]
