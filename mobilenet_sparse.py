@@ -10,6 +10,8 @@ from tensorboardX import SummaryWriter
 import torchvision.models as models
 from src.compute_flops import print_model_param_flops, print_model_param_nums
 import numpy as np
+# from signal import signal, SIGPIPE, SIG_DFL, SIG_IGN
+# signal(SIGPIPE, SIG_IGN)
 
 try:
     from apex import amp
@@ -145,21 +147,24 @@ class MobilenetSparseTrainer:
             self.optimizer.zero_grad()
             output = self.model(data)
             loss = self.criterion(output, target)
-            train_loss += loss
+            # train_loss += loss
+            train_loss += F.cross_entropy(output, target, reduction='sum').item()
             pred = output.data.max(1, keepdim=True)[1]
             correct += pred.eq(target.data.view_as(pred)).cpu().sum()
+
             if mixed_precision:
                 with amp.scale_loss(loss, self.optimizer) as scaled_loss:
                     scaled_loss.backward()
             else:
                 loss.backward()
+
             if self.sparse:
                 bn = self.updateBN()
                 self.writer.add_scalar("bn", bn, epoch)
-                print(bn, file=self.bn_file)
+                print("{}:{}".format(self.count_batch, bn), file=self.bn_file)
             self.optimizer.step()
 
-            train_loss /= len(self.test_loader.dataset)
+            train_loss /= len(self.train_loader.dataset)
             if batch_idx % 100 == 0 or batch_idx + 1 == len(self.train_loader):
                 print('Train Epoch: {} [{}/{} ({:.1f}%)]\t lr:{} Loss: {:.6f}'.format(
                     epoch, batch_idx * len(data), len(self.train_loader.dataset),
@@ -201,9 +206,15 @@ class MobilenetSparseTrainer:
             if epoch in [self.epoch * 0.5, self.epoch * 0.75]:
                 for param_group in self.optimizer.param_groups:
                     param_group['lr'] *= 0.1
+            elif epoch in [self.epoch * 0.75, self.epoch * 0.9]:
+                for param_group in self.optimizer.param_groups:
+                    param_group['lr'] *= 0.01
+            elif epoch in [self.epoch * 0.9, self.epoch]:
+                for param_group in self.optimizer.param_groups:
+                    param_group['lr'] *= 0.001
             train_acc, train_loss = self.train(epoch)
             val_acc, val_loss = self.test()
-            self.bn_file.write("\n")
+            # self.bn_file.write("\n")
 
             best_train_acc = train_acc if train_acc > best_train_acc else best_train_acc
             best_train_loss = train_loss if train_loss < best_train_loss else best_train_loss

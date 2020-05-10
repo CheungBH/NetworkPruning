@@ -7,16 +7,16 @@ device = 'cuda'
 # print("Using {}".format(device))
 
 
-mob_dest = "mob_bn_test"
-mob_sparse_dataset = ["cifar100", "cifar10"]
+mob_dest = "test"
+mob_sparse_dataset = ["cifar100"]
 mob_sparse_param = [1e-4, 1e-3, 5e-4, 2e-4]
-mob_ifsparse = [True, False]
+mob_ifsparse = [False]
 sparse_setting = ["origin"]
 # sparse_setting = ["big_c_huge_t_chprune", "big_c_big_t_chprune", "big_c_origin_t_chprune", "origin_c_big_t_chprune",
 #                   "origin_c_huge_t_chprune"]
 
 mob_epoch = 160
-mob_batch_size = 1024
+mob_batch_size = 128
 
 
 settings = {
