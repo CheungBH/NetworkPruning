@@ -217,12 +217,12 @@ class MobilenetSparseTrainer:
             if epoch in [self.epoch * 0.5, self.epoch * 0.75]:
                 for param_group in self.optimizer.param_groups:
                     param_group['lr'] *= 0.1
-            elif epoch in [self.epoch * 0.75, self.epoch * 0.9]:
-                for param_group in self.optimizer.param_groups:
-                    param_group['lr'] *= 0.01
-            elif epoch in [self.epoch * 0.9, self.epoch]:
-                for param_group in self.optimizer.param_groups:
-                    param_group['lr'] *= 0.001
+            # elif epoch in [self.epoch * 0.75, self.epoch * 0.9]:
+            #     for param_group in self.optimizer.param_groups:
+            #         param_group['lr'] *= 0.01
+            # elif epoch in [self.epoch * 0.9, self.epoch]:
+            #     for param_group in self.optimizer.param_groups:
+            #         param_group['lr'] *= 0.001
 
             train_acc, train_loss = self.train(epoch)
             val_acc, val_loss = self.test()
