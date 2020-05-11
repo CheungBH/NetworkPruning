@@ -174,7 +174,6 @@ class MobilenetSparseTrainer:
             print("{}:{}".format(self.count_batch, bn), file=self.bn_file)
             self.optimizer.step()
 
-            train_loss /= len(self.train_loader.dataset)
             if batch_idx % 100 == 0 or batch_idx + 1 == len(self.train_loader):
                 print('Train Epoch: {} [{}/{} ({:.1f}%)]\t lr:{} Loss: {:.6f}'.format(
                     epoch, batch_idx * len(data), len(self.train_loader.dataset),
@@ -182,6 +181,8 @@ class MobilenetSparseTrainer:
                 self.log.write('Train Epoch: {} [{}/{} ({:.1f}%)]\t lr:{} Loss: {:.6f}\n'.format(
                     epoch, batch_idx * len(data), len(self.train_loader.dataset),
                            100. * batch_idx / len(self.train_loader), lr, loss.item()))
+
+        train_loss /= len(self.train_loader.dataset)
         return float(correct) / float(len(self.train_loader.dataset)), train_loss
 
     def save_checkpoint(self, state, is_best, epoch, filepath):
@@ -222,6 +223,7 @@ class MobilenetSparseTrainer:
             elif epoch in [self.epoch * 0.9, self.epoch]:
                 for param_group in self.optimizer.param_groups:
                     param_group['lr'] *= 0.001
+
             train_acc, train_loss = self.train(epoch)
             val_acc, val_loss = self.test()
             self.bn_file.write("\n")

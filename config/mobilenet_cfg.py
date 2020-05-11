@@ -15,8 +15,8 @@ sparse_setting = ["origin"]
 # sparse_setting = ["big_c_huge_t_chprune", "big_c_big_t_chprune", "big_c_origin_t_chprune", "origin_c_big_t_chprune",
 #                   "origin_c_huge_t_chprune"]
 
-mob_epoch = 160
-mob_batch_size = 128
+mob_epoch = 2
+mob_batch_size = 1024
 
 
 settings = {
