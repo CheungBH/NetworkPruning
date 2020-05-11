@@ -115,6 +115,14 @@ class MobilenetSparseTrainer:
                 bn_num += len(m.weight.grad.data)
         return bn_sum/bn_num
 
+    def calBN(self):
+        bn_sum, bn_num = 0, 0
+        for m in self.model.modules():
+            if isinstance(m, nn.BatchNorm2d):
+                bn_sum += sum(abs(m.weight.grad.data)).cpu().tolist()
+                bn_num += len(m.weight.grad.data)
+        return bn_sum/bn_num
+
     def test(self):
         self.model.eval()
         test_loss = 0
@@ -160,8 +168,10 @@ class MobilenetSparseTrainer:
 
             if self.sparse:
                 bn = self.updateBN()
-                self.writer.add_scalar("bn", bn, epoch)
-                print("{}:{}".format(self.count_batch, bn), file=self.bn_file)
+            else:
+                bn = self.calBN()
+            self.writer.add_scalar("bn", bn, self.count_batch)
+            print("{}:{}".format(self.count_batch, bn), file=self.bn_file)
             self.optimizer.step()
 
             train_loss /= len(self.train_loader.dataset)
@@ -214,7 +224,7 @@ class MobilenetSparseTrainer:
                     param_group['lr'] *= 0.001
             train_acc, train_loss = self.train(epoch)
             val_acc, val_loss = self.test()
-            # self.bn_file.write("\n")
+            self.bn_file.write("\n")
 
             best_train_acc = train_acc if train_acc > best_train_acc else best_train_acc
             best_train_loss = train_loss if train_loss < best_train_loss else best_train_loss
